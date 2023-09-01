@@ -3,6 +3,7 @@ package api
 import (
 	"fmt"
 	"littleapi/storage"
+	"log"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -22,6 +23,7 @@ func NewServer(port string, store storage.Storage) *Server {
 
 func (s *Server) Start() error {
 	router := mux.NewRouter().StrictSlash(true)
+	router.HandleFunc("/users", s.handleGetUserList).Methods("GET")
 	router.HandleFunc("/user/{id}", s.handleGetUserByID).Methods("GET")
 	router.HandleFunc("/user/{id}", s.handleDeleteUserByID).Methods("DELETE")
 	router.HandleFunc("/user", s.handleCreateUser).Methods("POST")
@@ -33,8 +35,14 @@ func (s *Server) Start() error {
 func errorHandler(w http.ResponseWriter, r *http.Request, status int, message string) {
 	w.WriteHeader(status)
 	if message != "" {
-		fmt.Fprint(w, message)
+		_, err := fmt.Fprint(w, message)
+		if err != nil {
+			log.Println(err.Error())
+			return
+		}
 	}
+
+	fmt.Println(r.Method)
 }
 
 func contentTypeApplicationJsonMiddleware(next http.Handler) http.Handler {

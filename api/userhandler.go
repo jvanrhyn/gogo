@@ -18,7 +18,19 @@ func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(user)
+	_ = json.NewEncoder(w).Encode(user)
+}
+
+func (s *Server) handleGetUserList(w http.ResponseWriter, r *http.Request) {
+
+	users := s.store.All()
+
+	if users == nil {
+		errorHandler(w, r, http.StatusNotFound, "User not found")
+		return
+	}
+
+	_ = json.NewEncoder(w).Encode(users)
 }
 
 func getRequestId(r *http.Request) int {
@@ -55,6 +67,6 @@ func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	result := s.store.Add(user)
 	w.WriteHeader(http.StatusCreated)
-	json.NewEncoder(w).Encode(result)
+	_ = json.NewEncoder(w).Encode(result)
 
 }

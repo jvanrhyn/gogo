@@ -12,7 +12,7 @@ func main() {
 	port := flag.String("port", ":3000", "Port to listen on")
 	flag.Parse()
 
-	store := storage.NewMemoryStorage()
+	store := storage.NewDbStorage()
 
 	server := api.NewServer(*port, store)
 	fmt.Println("server is running on port: ", *port)
