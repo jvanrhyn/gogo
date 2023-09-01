@@ -10,13 +10,7 @@ import (
 )
 
 func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	id := vars["id"]
-
-	i, err := strconv.Atoi(id)
-	if err != nil {
-		panic(err)
-	}
+	i := getRequestId(r)
 	user := s.store.Get(i)
 
 	if user == nil {
@@ -27,8 +21,27 @@ func (s *Server) handleGetUserByID(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(user)
 }
 
-func (s *Server) handleDeleteUserByID(w http.ResponseWriter, r *http.Request) {
+func getRequestId(r *http.Request) int {
+	vars := mux.Vars(r)
+	id := vars["id"]
 
+	i, err := strconv.Atoi(id)
+	if err != nil {
+		panic(err)
+	}
+	return i
+}
+
+func (s *Server) handleDeleteUserByID(w http.ResponseWriter, r *http.Request) {
+	i := getRequestId(r)
+	err := s.store.Delete(i)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(err.Error())
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Server) handleCreateUser(w http.ResponseWriter, r *http.Request) {
