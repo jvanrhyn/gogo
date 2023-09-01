@@ -1,6 +1,8 @@
 package storage
 
-import "littleapi/types"
+import (
+	"littleapi/types"
+)
 
 type MemoryStorage struct {
 	users []*types.User
@@ -37,12 +39,16 @@ func (s *MemoryStorage) Add(user types.User) *types.User {
 	return &user
 }
 
-func (s *MemoryStorage) Delete(id int) error {
+func (s *MemoryStorage) Delete(id int) int {
 
 	user := s.Get(id)
+	if user == nil {
+		return 0
+	}
+
 	s.removeIt(user)
 
-	return nil
+	return 1
 }
 
 func (s *MemoryStorage) findHighestId() int {

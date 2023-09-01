@@ -34,10 +34,9 @@ func getRequestId(r *http.Request) int {
 
 func (s *Server) handleDeleteUserByID(w http.ResponseWriter, r *http.Request) {
 	i := getRequestId(r)
-	err := s.store.Delete(i)
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(err.Error())
+	var resp int = s.store.Delete(i)
+	if resp == 0 {
+		errorHandler(w, r, http.StatusNotFound, "User not found")
 		return
 	}
 
